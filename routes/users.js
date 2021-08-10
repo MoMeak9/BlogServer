@@ -56,7 +56,18 @@ router.get('/getUserInfo', async (req, res, next) => {
     let {username} = req.user
     try {
         let userinfo = await querySql('select nickname,head_img from user where username = ?', [username])
-        res.send({code: 1, msg: "成功", data: userinfo})
+        let data = {
+            ...userinfo,
+            menuItems: [
+                {text: '新增文章', icon: 'mdi-folder', link: '/editor'},
+                {text: '文章管理', icon: 'mdi-account-multiple', link: '/manager'},
+                {text: '评论管理', icon: 'mdi-star', link: '/comment'},
+                {text: '查看留言', icon: 'mdi-history', link: '/personal'},
+                {text: '站点统计', icon: 'mdi-check-circle', link: '/personal'},
+                {text: '个人中心', icon: 'mdi-check-circle', link: '/personal'},
+            ]
+        }
+        res.send({code: 1, msg: "成功", data: data})
     } catch (err) {
         console.log(err)
         next(err)

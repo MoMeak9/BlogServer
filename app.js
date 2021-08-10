@@ -11,7 +11,7 @@ const artRouter = require('./routes/article');
 const usersRouter = require('./routes/users');
 const commentRouter = require('./routes/comment')
 
-const port = 9000
+const port = 3000
 const app = express();
 
 // view engine setup
