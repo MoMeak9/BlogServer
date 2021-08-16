@@ -4,28 +4,47 @@ const querySql = require('../db/index')
 
 /* 新增博客接口 */
 router.post('/add', async (req, res, next) => {
-    let {title, content} = req.body
-    let {username} = req.user
-    try {
-        let result = await querySql('select uuid from user where username = ?', [username])
-        let user_id = result[0].uuid
-        await querySql('insert into article(title,content,user_id,create_time) values(?,?,?,NOW())', [title, content, user_id])
-        res.send({code: 0, msg: '新增成功', data: null})
-    } catch (e) {
-        console.log(e)
-        next(e)
+    console.log(req.body)
+    let {title, content, synopsis, tag} = req.body
+    let {username, role} = req.user
+    if (role !== 1) {
+        res.send({code: -1, msg: '无权限', data: null})
+    } else {
+        try {
+            let result = await querySql('select role,uuid from user where username = ?', [username])
+            let user_uuid = result[0].uuid
+            if (result[0].role !== 1) {
+                res.send({code: -1, msg: '无权限', data: null})
+            } else {
+                try {
+                    await querySql('insert into article(title,content,user_uuid,synopsis,tag,create_time) values(?,?,?,?,?,NOW())', [title, content, user_uuid, synopsis, tag])
+                    res.send({code: 1, msg: '新增成功', data: null})
+                } catch (e) {
+                    console.log(e)
+                    next(e)
+                }
+            }
+        } catch (e) {
+            console.log(e)
+            next(e)
+        }
     }
 });
 
-// 获取全部博客列表接口
-router.get('/allList', async (req, res, next) => {
-    try {
-        let sql = 'select id,title,content,DATE_FORMAT(create_time,"%Y-%m-%d %H:%i:%s") AS create_time from article'
-        let result = await querySql(sql)
-        res.send({code: 0, msg: '获取成功', data: result})
-    } catch (e) {
-        console.log(e)
-        next(e)
+// 获取全部博客列表接口 记得分页
+router.post('/allList', async (req, res, next) => {
+    let {role} = req.user
+    if (role !== 1) {
+        res.send({code: -1, msg: '无权限', data: null})
+    } else {
+        try {
+            let sql = 'select *,DATE_FORMAT(create_time,"%Y-%m-%d %H:%i:%s") AS create_time from article'
+            let result = await querySql(sql)
+            res.send({code: 0, msg: '获取成功', data: result})
+        } catch (e) {
+            console.log(e)
+            next(e)
+        }
     }
 });
 

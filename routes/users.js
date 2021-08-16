@@ -41,7 +41,7 @@ router.post('/login', async (req, res, next) => {
             if (!result || result.length === 0) {
                 res.send({code: -1, msg: "密码不正确"})
             } else {
-                let token = jwt.sign({username}, PRIVATE_KEY, {expiresIn: EXPIRES})
+                let token = jwt.sign({username:username,role:result[0].role}, PRIVATE_KEY, {expiresIn: EXPIRES})
                 res.send({code: 1, msg: "登入成功", token: token})
             }
         }
@@ -55,26 +55,37 @@ router.post('/login', async (req, res, next) => {
 router.get('/getUserInfo', async (req, res, next) => {
     let {username} = req.user
     try {
-        let userinfo = await querySql('select nickname,head_img from user where username = ?', [username])
-        let data = {
-            ...userinfo,
-            menuItems: [
-                {text: '新增文章', icon: 'mdi-folder', link: '/editor'},
-                {text: '文章管理', icon: 'mdi-account-multiple', link: '/manager'},
-                {text: '评论管理', icon: 'mdi-star', link: '/comment'},
-                {text: '查看留言', icon: 'mdi-history', link: '/personal'},
-                {text: '站点统计', icon: 'mdi-check-circle', link: '/personal'},
-                {text: '个人中心', icon: 'mdi-check-circle', link: '/personal'},
-            ]
+        let userinfo = await querySql('select nickname,head_img,role,intro,uuid,sex,age,school from user where username = ?', [username])
+        if(userinfo[0].role===1){
+            let data = {
+                ...userinfo[0],
+                menuItems: [
+                    {text: '新增文章', icon: 'mdi-folder', link: '/manager/editor'},
+                    {text: '文章管理', icon: 'mdi-account-multiple', link: '/manager/my'},
+                    {text: '评论管理', icon: 'mdi-star', link: '/comment'},
+                    {text: '留言板', icon: 'mdi-history', link: '/personal'},
+                    {text: '站点统计', icon: 'mdi-check-circle', link: '/personal'},
+                    {text: '个人中心', icon: 'mdi-check-circle', link: '/personal'},
+                ]
+            }
+            res.send({code: 1, msg: "成功", data: data})
+        }else {
+            let data = {
+                ...userinfo[0],
+                menuItems: [
+                    {text: '收到的评论', icon: 'mdi-history', link: '/personal'},
+                    {text: '个人中心', icon: 'mdi-check-circle', link: '/personal'},
+                ]
+            }
+            res.send({code: 1, msg: "成功", data: data})
         }
-        res.send({code: 1, msg: "成功", data: data})
     } catch (err) {
         console.log(err)
         next(err)
     }
 });
 
-// 修改个人信息(密码)
+// 修改个人信息(密码) 原密码与确认密码
 router.post('/editInfo', function (req, res, next) {
 
     }
@@ -97,10 +108,10 @@ router.post('/uploadImage', upload.single('head_img'), async (req, res, next) =>
 
 //用户信息更新接口
 router.post('/updateUser', async (req, res, next) => {
-    let {nickname, head_img} = req.body
+    let {nickname, sex, age, school, intro} = req.body
     let {username} = req.user
     try {
-        let result = await querySql('update user set nickname = ?,head_img = ? where username = ?', [nickname, head_img, username])
+        let result = await querySql('update user set nickname = ?,sex = ?,age = ?,school = ?,intro = ? where username = ?', [nickname, sex, , age, school, intro, username])
         res.send({code: 1, msg: '更新成功', data: null})
     } catch (err) {
         console.log(err)
