@@ -6,5 +6,5 @@ module.exports = {
     PRIVATE_KEY: 'NodeBlogFoMYTOKEN',
     EXPIRES: 60 * 60 * 24,
     serverAddress: 'https://app.yihuiblog.top',
-    whitelist: ['/api/user/register', '/api/user/login']
+    whitelist: ['/api/user/register', '/api/user/login','/api/article/allArticle']
 }

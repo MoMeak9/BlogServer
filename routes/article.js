@@ -48,21 +48,30 @@ router.post('/allList', async (req, res, next) => {
     }
 });
 
-// 获取我的博客列表接口
-router.get('/myList', async (req, res, next) => {
-    let {username} = req.user
+// 获取全部博客列表接口 记得分页
+router.post('/allArticle', async (req, res, next) => {
     try {
-        let userSql = 'select id from user where username = ?'
-        let user = await querySql(userSql, [username])
-        let user_id = user[0].id
-        let sql = 'select id,title,content,DATE_FORMAT(create_time,"%Y-%m-%d %H:%i:%s") AS create_time from article where user_id = ?'
-        let result = await querySql(sql, [user_id])
-        res.send({code: 0, msg: '获取成功', data: result})
+        let sql = 'select *,DATE_FORMAT(create_time,"%Y-%m-%d %H:%i:%s") AS create_time from article where state = 0'
+        let result = await querySql(sql)
+        res.send({code: 0, msg: '获取文章列表成功', data: result})
     } catch (e) {
         console.log(e)
         next(e)
     }
 });
+
+// 文章分类查询
+router.get('/classify', async (req, res, next) => {
+    try {
+        let sql = 'select *,DATE_FORMAT(create_time,"%Y-%m-%d %H:%i:%s") AS create_time from article where state = 0'
+        let result = await querySql(sql)
+        res.send({code: 0, msg: '获取文章列表成功', data: result})
+    } catch (e) {
+        console.log(e)
+        next(e)
+    }
+});
+
 
 // 获取博客详情接口
 router.get('/detail', async (req, res, next) => {
