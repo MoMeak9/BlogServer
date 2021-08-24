@@ -2,7 +2,7 @@ const express = require('express');
 const router = express.Router();
 const querySql = require('../db/index')
 
-/* 新增博客接口 */
+// 新增博客接口
 router.post('/add', async (req, res, next) => {
     console.log(req.body)
     let {title, content, synopsis, tag} = req.body
@@ -31,7 +31,7 @@ router.post('/add', async (req, res, next) => {
     }
 });
 
-// 获取全部博客列表接口 记得分页
+// 获取全部博客列表接口 记得分页 管理可见
 router.post('/allList', async (req, res, next) => {
     let {role} = req.user
     if (role !== 1) {
@@ -48,7 +48,9 @@ router.post('/allList', async (req, res, next) => {
     }
 });
 
-// 获取全部博客列表接口 记得分页
+// 文章状态管理
+
+// 获取全部博客列表接口 记得分页 游客可见
 router.post('/allArticle', async (req, res, next) => {
     try {
         let sql = 'select *,DATE_FORMAT(create_time,"%Y-%m-%d %H:%i:%s") AS create_time from article where state = 0'
