@@ -53,8 +53,23 @@ router.post('/allList', async (req, res, next) => {
 // 获取全部博客列表接口 记得分页 游客可见
 router.post('/allArticle', async (req, res, next) => {
     try {
-        let sql = 'select *,DATE_FORMAT(create_time,"%Y-%m-%d %H:%i:%s") AS create_time from article where state = 0'
-        let result = await querySql(sql)
+        let allArticle = await querySql('select *,DATE_FORMAT(create_time,"%Y-%m-%d %H:%i:%s") AS create_time from article where state = 0')
+        let classify = await querySql('select * from classify')
+        for (let i = 0; i < classify.length; i++) {
+            classify[i].sub_items = classify[i].sub_items.split(',')
+            let sub_items = classify[i].sub_items
+            for (let j = 0; j < sub_items.length; j++) {
+                let num = await querySql(`SELECT COUNT(*) AS num FROM article WHERE tag REGEXP '${sub_items[j]}'`)
+                sub_items[j] = {
+                    title: sub_items[j],
+                    num: num[0].num
+                }
+            }
+        }
+        let result = {
+            allArticle,
+            classify
+        }
         res.send({code: 0, msg: '获取文章列表成功', data: result})
     } catch (e) {
         console.log(e)
@@ -62,12 +77,44 @@ router.post('/allArticle', async (req, res, next) => {
     }
 });
 
-// 文章分类查询
+// 文章归档查询接口
 router.get('/classify', async (req, res, next) => {
+    let classifyByTag = [], classifyByDate = []
     try {
-        let sql = 'select *,DATE_FORMAT(create_time,"%Y-%m-%d %H:%i:%s") AS create_time from article where state = 0'
-        let result = await querySql(sql)
-        res.send({code: 0, msg: '获取文章列表成功', data: result})
+        let tags = await querySql('select class from classify')
+        for (let i = 0; i < tags.length; i++) {
+            let num = await querySql(`SELECT COUNT(*) AS num FROM article WHERE classify='${tags[i].class}'`)
+            classifyByTag.push({
+                className: tags[i].class,
+                num: num[0].num
+            })
+        }
+        // 自动查询近一年文章
+        const date = new Date();
+        for (let i = 0; i < 12; i++) {
+            let month = ''
+            let getMonth = date.getMonth()
+            let getFullYear = date.getFullYear()
+            if (getMonth - i < 0) {
+                let nowMonth = (12 + (getMonth + 1 - i))
+                month = getFullYear - 1 + '-' + ((nowMonth < 10) ? "0" + nowMonth : nowMonth)
+            } else {
+                let nowMonth = (getMonth + 1 - i)
+                month = getFullYear + '-' + ((nowMonth < 10) ? "0" + nowMonth : nowMonth)
+            }
+            let articleList = await querySql(`SELECT title,user_uuid,tag,reading_times,praise_times,DATE_FORMAT(create_time,"%Y-%m-%d %H:%i") AS create_time FROM article WHERE create_time REGEXP '${month}' AND state='0'`)
+            classifyByDate.push({
+                month: month,
+                articleList: articleList
+            })
+        }
+        date.getMonth(); //获取当前月份(0-11,0代表1月)
+        res.send({
+            code: 0, msg: '获取文章列表成功', data: {
+                classifyByTag,
+                classifyByDate
+            }
+        })
     } catch (e) {
         console.log(e)
         next(e)
@@ -121,5 +168,4 @@ router.post('/delete', async (req, res, next) => {
         next(e)
     }
 });
-
 module.exports = router;

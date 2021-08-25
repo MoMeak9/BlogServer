@@ -86,7 +86,7 @@ router.get('/getUserInfo', async (req, res, next) => {
 });
 
 // 修改个人信息(密码) 原密码与确认密码
-router.post('/editInfo', function (req, res, next) {
+router.post('/editPassword', function (req, res, next) {
 
     }
 );
