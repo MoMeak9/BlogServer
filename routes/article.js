@@ -123,12 +123,14 @@ router.get('/classify', async (req, res, next) => {
 
 
 // 获取博客详情接口
-router.get('/detail', async (req, res, next) => {
-    let article_id = req.query.article_id
+router.post('/detail', async (req, res, next) => {
+    let {article_id} = req.body
+    console.log(article_id)
     try {
-        let sql = 'select id,title,content,DATE_FORMAT(create_time,"%Y-%m-%d %H:%i:%s") AS create_time from article where id = ?'
+        let sql = 'select *,DATE_FORMAT(create_time,"%Y-%m-%d %H:%i:%s") AS create_time,DATE_FORMAT(update_time,"%Y-%m-%d %H:%i:%s") AS update_time from article where id = ?'
         let result = await querySql(sql, [article_id])
-        res.send({code: 0, msg: '获取成功', data: result[0]})
+        let user = await querySql('select nickname from user where uuid = ? ', [result[0].user_uuid])
+        res.send({code: 0, msg: '获取成功', data: {...result[0], userName: user[0].nickname}})
     } catch (e) {
         console.log(e)
         next(e)
