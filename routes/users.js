@@ -63,7 +63,6 @@ router.get('/getUserInfo', async (req, res, next) => {
                     {text: '新增文章', icon: 'mdi-folder', link: '/manager/editor'},
                     {text: '文章管理', icon: 'mdi-account-multiple', link: '/manager/my'},
                     {text: '评论管理', icon: 'mdi-star', link: '/comment'},
-                    {text: '留言板', icon: 'mdi-history', link: '/personal'},
                     {text: '站点统计', icon: 'mdi-check-circle', link: '/personal'},
                     {text: '个人中心', icon: 'mdi-check-circle', link: '/personal'},
                 ]

@@ -102,7 +102,7 @@ router.get('/classify', async (req, res, next) => {
                 let nowMonth = (getMonth + 1 - i)
                 month = getFullYear + '-' + ((nowMonth < 10) ? "0" + nowMonth : nowMonth)
             }
-            let articleList = await querySql(`SELECT title,user_uuid,tag,reading_times,praise_times,DATE_FORMAT(create_time,"%Y-%m-%d %H:%i") AS create_time FROM article WHERE create_time REGEXP '${month}' AND state='0'`)
+            let articleList = await querySql(`SELECT title,id,user_uuid,tag,reading_times,praise_times,DATE_FORMAT(create_time,"%Y-%m-%d %H:%i") AS create_time FROM article WHERE create_time REGEXP '${month}' AND state='0'`)
             classifyByDate.push({
                 month: month,
                 articleList: articleList
@@ -154,20 +154,38 @@ router.post('/update', async (req, res, next) => {
     }
 });
 
-// 删除博客接口
-router.post('/delete', async (req, res, next) => {
-    let {article_id} = req.body
-    let {username} = req.user
+// 更新博客状态
+router.post('/editState', async (req, res, next) => {
+    // 0 正常 -1 下架 1 草稿 -2 删除
+    let {article_id, user_uuid, state} = req.body
+    if (state === -2) {
+        try {
+            await querySql('delete from article where id = ? and user_uuid = ?', [article_id, user_uuid])
+            res.send({code: 0, msg: '删除成功', data: null})
+        } catch (e) {
+            console.log(e)
+            next(e)
+        }
+    } else {
+        try {
+            await querySql('update article set state = ? where id = ? and user_uuid = ?', [state, article_id, user_uuid])
+            res.send({code: 1, msg: '修改成功', data: null})
+        } catch (e) {
+            console.log(e)
+            next(e)
+        }
+    }
+});
+
+// 文章所有分类及其标签
+router.get('/allClassAndTags', async (req, res, next) => {
     try {
-        let userSql = 'select id from user where username = ?'
-        let user = await querySql(userSql, [username])
-        let user_id = user[0].id
-        let sql = 'delete from article where id = ? and user_id = ?'
-        let result = await querySql(sql, [article_id, user_id])
-        res.send({code: 0, msg: '删除成功', data: null})
+        let result = await querySql('select * from classify')
+        res.send({code: 1, msg: '请求成功', data: result})
     } catch (e) {
         console.log(e)
         next(e)
     }
 });
+
 module.exports = router;
