@@ -41,7 +41,7 @@ router.post('/login', async (req, res, next) => {
             if (!result || result.length === 0) {
                 res.send({code: -1, msg: "密码不正确"})
             } else {
-                let token = jwt.sign({username:username,role:result[0].role}, PRIVATE_KEY, {expiresIn: EXPIRES})
+                let token = jwt.sign({username: username, role: result[0].role}, PRIVATE_KEY, {expiresIn: EXPIRES})
                 res.send({code: 1, msg: "登入成功", token: token})
             }
         }
@@ -56,7 +56,7 @@ router.get('/getUserInfo', async (req, res, next) => {
     let {username} = req.user
     try {
         let userinfo = await querySql('select nickname,head_img,role,intro,uuid,sex,age,school from user where username = ?', [username])
-        if(userinfo[0].role===1){
+        if (userinfo[0].role === 1) {
             let data = {
                 ...userinfo[0],
                 menuItems: [
@@ -69,7 +69,7 @@ router.get('/getUserInfo', async (req, res, next) => {
                 ]
             }
             res.send({code: 1, msg: "成功", data: data})
-        }else {
+        } else {
             let data = {
                 ...userinfo[0],
                 menuItems: [
@@ -90,20 +90,11 @@ router.post('/editInfo', function (req, res, next) {
 
     }
 );
-//上传头像
-router.post('/uploadImage', upload.single('head_img'), async (req, res, next) => {
-    let {username} = req.user
-    console.log(req.file)
+//上传文件
+router.post('/uploadImage', upload.single('img'), async (req, res, next) => {
     let imgPath = req.file.path.split('public')[1]
     let imgUrl = serverAddress + imgPath
-    try {
-        await querySql('update user set head_img = ? where username = ?', [imgUrl, username])
-        res.send({code: 1, msg: '更新成功', data: {imgUrl: imgUrl}})
-    } catch (err) {
-        console.log(err)
-        next(err)
-    }
-    res.send({code: 1, msg: '上传成功', data: imgUrl})
+    res.send({code: 1, msg: '上传成功', data: {imgUrl: imgUrl, name: req.file.originalname}})
 });
 
 //用户信息更新接口
