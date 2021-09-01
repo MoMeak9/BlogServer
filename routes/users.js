@@ -63,7 +63,6 @@ router.get('/getUserInfo', async (req, res, next) => {
                     {text: '新增文章', icon: 'mdi-folder', link: '/manager/editor'},
                     {text: '文章管理', icon: 'mdi-account-multiple', link: '/manager/my'},
                     {text: '评论管理', icon: 'mdi-star', link: '/comment'},
-                    {text: '留言板', icon: 'mdi-history', link: '/personal'},
                     {text: '站点统计', icon: 'mdi-check-circle', link: '/personal'},
                     {text: '个人中心', icon: 'mdi-check-circle', link: '/personal'},
                 ]
@@ -86,7 +85,7 @@ router.get('/getUserInfo', async (req, res, next) => {
 });
 
 // 修改个人信息(密码) 原密码与确认密码
-router.post('/editInfo', function (req, res, next) {
+router.post('/editPassword', function (req, res, next) {
 
     }
 );
