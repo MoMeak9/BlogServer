@@ -101,7 +101,7 @@ router.post('/updateUser', async (req, res, next) => {
     let {nickname, sex, age, school, intro} = req.body
     let {username} = req.user
     try {
-        let result = await querySql('update user set nickname = ?,sex = ?,age = ?,school = ?,intro = ? where username = ?', [nickname, sex, , age, school, intro, username])
+        let result = await querySql('update user set nickname = ?,sex = ?,age = ?,school = ?,intro = ? where username = ?', [nickname, sex, age, school, intro, username])
         res.send({code: 1, msg: '更新成功', data: null})
     } catch (err) {
         console.log(err)
