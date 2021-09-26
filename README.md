@@ -23,10 +23,10 @@ NodeJS博客后端 express
     |   |-- stylesheets
     |       |-- style.css
     |-- routes
-    |   |-- article.js
-    |   |-- comment.js
-    |   |-- users.js
-    |   |-- website.js
+    |   |-- articleService.js
+    |   |-- commentService.js
+    |   |-- usersService.js
+    |   |-- websiteService.js
     |-- utils
         |-- constant.js
         |-- index.js
