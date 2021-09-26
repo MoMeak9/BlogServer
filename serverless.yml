@@ -1,46 +1,39 @@
-org: '1259409954'
-app: blogserver
-stage: dev
 component: http
-name: service-aw37oooe
+name: http-express-U_av0yRdN
 inputs:
   src:
     src: ./
     exclude:
       - .env
-  region: ap-guangzhou
-  sourceCosInfo:
-    bucket: sp-ins-prod-1300963013
-    region: ap-guangzhou
-    key: 490ab35c-8b47-4acf-966f-32ed3346d2c6.zip
-  isAutoCiDeploy: false
   faas:
+    framework: express
+    name: '${name}'
     runtime: Nodejs12.16
     eip: false
     timeout: 3
     memorySize: 512
     tags: []
-    framework: express
-    bootstrap:
-      cmd: >-
-        %23!%2Fusr%2Fbin%2Fenv%20bash%0A%2Fvar%2Flang%2Fnode12%2Fbin%2Fnode%20app.js
     layers:
       - name: '${output:${stage}:${app}:blogserver-layer.name}'
         version: '${output:${stage}:${app}:blogserver-layer.version}'
   apigw:
-    timeout: 60
     protocols:
       - http
       - https
+    timeout: 60
     environment: release
     customDomains:
       - domain: app.yihuiblog.top
         certId: p3I1wkb6
         protocols:
-          - http
           - https
         pathMap:
           - path: /
             environment: release
         isDefaultMapping: false
+  region: ap-guangzhou
+  isAutoCiDeploy: false
   static: {}
+org: '1259409954'
+app: blogserver
+stage: dev
