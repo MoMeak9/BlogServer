@@ -63,7 +63,7 @@ router.get('/getUserInfo', async (req, res, next) => {
                     {text: '新增文章', icon: 'mdi-folder', link: '/manager/editor'},
                     {text: '文章管理', icon: 'mdi-account-multiple', link: '/manager/my'},
                     {text: '评论管理', icon: 'mdi-star', link: '/comment'},
-                    {text: '站点统计', icon: 'mdi-check-circle', link: '/personal'},
+                    {text: '站点统计', icon: 'mdi-check-circle', link: '/manager/website'},
                     {text: '个人中心', icon: 'mdi-check-circle', link: '/personal'},
                 ]
             }
@@ -96,25 +96,12 @@ router.post('/uploadImage', upload.single('img'), async (req, res, next) => {
     res.send({code: 1, msg: '上传成功', data: {imgUrl: imgUrl, name: req.file.originalname}})
 });
 
-// 上传头像
-router.post('/uploadImage', upload.single('img'), async (req, res, next) => {
-    let imgPath = req.file.path.split('public')[1]
-    let imgUrl = serverAddress + imgPath
-    try {
-
-    } catch (err) {
-        console.log(err)
-        next(err)
-    }
-    res.send({code: 1, msg: '上传成功', data: {imgUrl: imgUrl, name: req.file.originalname}})
-});
-
 //用户信息更新接口
 router.post('/updateUser', async (req, res, next) => {
-    let {nickname, sex, age, school, intro} = req.body
+    let {nickname, head_img, sex, age, school, intro} = req.body
     let {username} = req.user
     try {
-        await querySql('update user set nickname = ?,sex = ?,age = ?,school = ?,intro = ? where username = ?', [nickname, sex, age, school, intro, username])
+        await querySql('update user set nickname = ?,head_img = ?,sex = ?,age = ?,school = ?,intro = ? where username = ?', [nickname, head_img, sex, age, school, intro, username])
         res.send({code: 1, msg: '更新成功', data: null})
     } catch (err) {
         console.log(err)
