@@ -7,6 +7,7 @@ const articleRouter = require('../routes/article');
 const websiteRouter = require('../routes/website');
 const createError = require("http-errors");
 const expressJWT = require("express-jwt");
+const swagger = require('../routes/swagger');
 
 const router = express.Router();
 
@@ -21,6 +22,7 @@ router.use('/api/user', usersRouter);
 router.use('/api/comment', commentRouter);
 router.use('/api/article', articleRouter);
 router.use('/api/website', websiteRouter);
+router.use('/api', swagger);
 
 // catch 404 and forward to error handler
 router.use(function (req, res, next) {

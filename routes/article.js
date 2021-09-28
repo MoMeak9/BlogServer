@@ -53,7 +53,7 @@ router.post('/allList', async (req, res, next) => {
 // 获取全部博客列表接口 记得分页 游客可见
 router.post('/allArticle', async (req, res, next) => {
     try {
-        let allArticle = await querySql('select *,DATE_FORMAT(create_time,"%Y-%m-%d %H:%i:%s") AS create_time from article where state = 0')
+        let allArticle = await querySql('select *,DATE_FORMAT(create_time,"%Y-%m-%d %H:%i:%s") AS create_time from article where state = 0 order by create_time desc')
         let classify = await querySql('select * from classify')
         for (let i = 0; i < classify.length; i++) {
             classify[i].sub_items = classify[i].sub_items.split(',')
@@ -146,7 +146,7 @@ router.post('/update', async (req, res, next) => {
         let user = await querySql(userSql, [username])
         let user_id = user[0].id
         let sql = 'update article set title = ?,content = ? where id = ? and user_id = ?'
-        let result = await querySql(sql, [title, content, article_id, user_id])
+        await querySql(sql, [title, content, article_id, user_id])
         res.send({code: 0, msg: '更新成功', data: null})
     } catch (e) {
         console.log(e)
