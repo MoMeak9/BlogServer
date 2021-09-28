@@ -3,6 +3,7 @@ const path = require('path');
 const cookieParser = require('cookie-parser');
 const cors = require('cors')
 const routers = require('./routes');
+const bodyParser = require('body-parser');
 
 let port = 3000;
 
@@ -13,6 +14,9 @@ if (process.env.NODE_ENV === 'development') {
     console.log('当前环境是生产环境');
 }
 const app = express();
+
+app.use(bodyParser.json({limit: '50mb'}));
+app.use(bodyParser.urlencoded({limit: '50mb', extended: true}));
 
 // view engine setup
 app.set('views', path.join(__dirname, 'views'));
